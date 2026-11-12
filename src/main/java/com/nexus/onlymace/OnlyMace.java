@@ -7,7 +7,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BrewingStartEvent;
 import org.bukkit.event.block.CrafterCraftEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -75,9 +74,6 @@ public final class OnlyMace extends JavaPlugin implements Listener {
             bossBar.setVisible(false);
         }
     }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBrewingStart(BrewingStartEvent event) { event.setCancelled(true); }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBrew(BrewEvent event) { event.setCancelled(true); }
@@ -281,7 +277,7 @@ public final class OnlyMace extends JavaPlugin implements Listener {
         Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "✦ THE RITUAL IS COMPLETE! ✦");
         Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE
                 + getConfig().getString("ritual-started-by", "A player") + " received the Only Mace!");
-        ritualOrigin.getWorld().spawnParticle(Particle.FIREWORKS_SPARK,
+        ritualOrigin.getWorld().spawnParticle(Particle.FIREWORK,
                 ritualOrigin.clone().add(0, 1, 0), 100, 1.3, 1.5, 1.3, 0.18);
         ritualOrigin.getWorld().playSound(ritualOrigin, Sound.UI_TOAST_CHALLENGE_COMPLETE, 2, 0.65f);
     }
