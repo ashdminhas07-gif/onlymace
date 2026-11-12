@@ -1,0 +1,6 @@
+name: OnlyMace
+version: 1.0.0
+main: com.nexus.onlymace.OnlyMace
+api-version: '1.21.11'
+author: Nexus
+description: One global mace, ritual, potion shutdown and mace cooldown.
