@@ -3,6 +3,8 @@ package com.nexus.onlymace;
 import org.bukkit.*;
 import org.bukkit.block.Crafter;
 import org.bukkit.boss.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -63,6 +65,53 @@ public final class OnlyMace extends JavaPlugin implements Listener {
                 getLogger().warning("Saved ritual world UUID is invalid; ritual could not resume.");
             }
         }
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!command.getName().equalsIgnoreCase("directgivemace")) return false;
+
+        if (args.length != 1) {
+            sender.sendMessage(ChatColor.RED + "Usage: /directgivemace <player>");
+            return true;
+        }
+
+        Player target = Bukkit.getPlayerExact(args[0]);
+        if (target == null) {
+            sender.sendMessage(ChatColor.RED + "That player is not online.");
+            return true;
+        }
+
+        if (claimed) {
+            sender.sendMessage(ChatColor.RED + "The Only Mace has already been claimed.");
+            return true;
+        }
+
+        // Claim the global mace before handing it out, so crafting and crafters
+        // cannot start another ritual or create a second Only Mace.
+        claimed = true;
+        getConfig().set("mace-claimed", true);
+
+        // If a ritual was already running, stop it so it cannot drop another mace.
+        if (ritualTask != null) {
+            ritualTask.cancel();
+            ritualTask = null;
+        }
+        removeRitualVisuals();
+        getConfig().set("ritual-active", false);
+        saveConfig();
+
+        if (bossBar != null) {
+            bossBar.removeAll();
+            bossBar.setVisible(false);
+        }
+
+        giveOrDrop(target, List.of(namedMace()));
+        target.sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD
+                + "You have received THE ONLY MACE!");
+        sender.sendMessage(ChatColor.GREEN + "Gave THE ONLY MACE directly to "
+                + target.getName() + " without a ritual timer.");
+        return true;
     }
 
     @Override
