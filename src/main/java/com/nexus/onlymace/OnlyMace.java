@@ -131,27 +131,26 @@ public final class OnlyMace extends JavaPlugin implements Listener {
         if (event.getResult().getType() != Material.MACE) return;
         event.setCancelled(true);
         Location location = event.getBlock().getLocation().add(0.5, 1.25, 0.5);
+        // CrafterCraftEvent runs on the server thread. Clear its live block inventory
+        // immediately; scheduling this for the next tick lets the crafter retain its
+        // ingredients while our returned items are already dropped, causing duplication.
+        if (!(event.getBlock().getState() instanceof Crafter crafter)) return;
+
         if (claimed) {
-            Bukkit.getScheduler().runTask(this, () -> {
-                if (event.getBlock().getState() instanceof Crafter crafter) {
-                    List<ItemStack> returned = extractKeyIngredients(crafter.getInventory().getContents());
-                    crafter.getInventory().clear();
-                    crafter.update(true, false);
-                    dropItems(location, returned);
-                }
-            });
+            List<ItemStack> returned = extractKeyIngredients(crafter.getInventory().getContents());
+            crafter.getInventory().clear();
+            crafter.update(true, false);
+            dropItems(location, returned);
             return;
         }
+
         claimed = true;
         getConfig().set("mace-claimed", true);
         saveConfig();
-        Bukkit.getScheduler().runTask(this, () -> {
-            if (event.getBlock().getState() instanceof Crafter crafter) {
-                crafter.getInventory().clear();
-                crafter.update(true, false);
-            }
-            startRitual(location, "The Autocrafter");
-        });
+
+        crafter.getInventory().clear();
+        crafter.update(true, false);
+        startRitual(location, "The Autocrafter");
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
