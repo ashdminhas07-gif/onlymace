@@ -1,6 +1,15 @@
 name: OnlyMace
-version: 1.0.1
+version: 1.0.2
 main: com.nexus.onlymace.OnlyMace
 api-version: '1.21.11'
 author: Nexus
 description: One global mace, ritual, potion shutdown and mace cooldown.
+commands:
+  directgivemace:
+    description: Directly give the Only Mace to a player without the ritual timer.
+    usage: /directgivemace <player>
+    permission: onlymace.directgive
+permissions:
+  onlymace.directgive:
+    description: Allows directly giving the Only Mace.
+    default: op
